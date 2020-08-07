@@ -2,7 +2,6 @@ import random
 
 from util import Events
 from AbstractPlugin import AbstractPlugin
-from datetime import datetime
 
 
 class Plugin(AbstractPlugin):
@@ -18,7 +17,6 @@ class Plugin(AbstractPlugin):
             await self.rate(message_object, args[1])
 
     async def rate(self, message_object, rated):
-        random.seed(datetime.now())
         number = round(random.uniform(1, 100), 2)
         print(message_object.mentions)
         if (rated):

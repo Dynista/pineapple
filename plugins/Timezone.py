@@ -15,8 +15,8 @@ class Plugin(AbstractPlugin):
             pytz.timezone('America/New_York'), 
             pytz.timezone('Europe/London'),
             pytz.timezone('Europe/Amsterdam'),
-            pytz.timezone('Asia/Tokyo'),
             pytz.timezone('Europe/Kiev'),
+            pytz.timezone('Asia/Tokyo'),
         ]
         self.short_output_format = '%b %d %Y- %H:%M'
         self.output_format = self.short_output_format + ' **%Z**'

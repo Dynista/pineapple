@@ -56,12 +56,13 @@ class Plugin(AbstractPlugin):
         self.race = self.Race()
         self.race.participants = list()
         self.race.finish_pos = 1
-        race_start = await self.pm.clientWrap.send_message(self.name, message_object.channel,
-                                                           message_object.author.display_name +
-                                                           " has started a race! \n"
-                                                           "Type " + self.pm.botPreferences.commandPrefix +
-                                                           "joinrace [emoji] to "
-                                                           "join the race (30s)")
+        # this will always be a single message
+        race_start = (await self.pm.clientWrap.send_message(self.name, message_object.channel,
+                                                            message_object.author.display_name +
+                                                            " has started a race! \n"
+                                                            "Type " + self.pm.botPreferences.commandPrefix +
+                                                            "joinrace [emoji] to "
+                                                            "join the race (30s)"))[0]
         # Give users time to join
         self.race.open = True
         await asyncio.sleep(30)
@@ -134,9 +135,10 @@ class Plugin(AbstractPlugin):
                           ":snail:", ":bee:", ":elephant:", ":gorilla:", ":squid:"]
                 await self.user_join_as_emoji(message_object, random.choice(emojis))
         else:
-            not_running = await self.pm.clientWrap.send_message(self.name, message_object.channel,
-                                                                "There is no active or open race at this moment! "
-                                                                "Please start one with '!race'")
+            # this will always be a single message
+            not_running = (await self.pm.clientWrap.send_message(self.name, message_object.channel,
+                                                                 "There is no active or open race at this moment! "
+                                                                 "Please start one with '!race'"))[0]
             await asyncio.sleep(3)
             await not_running.delete()
 
