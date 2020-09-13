@@ -18,3 +18,15 @@ board =
 
 [Fixer]
 apikey =
+
+[Pixiv]
+username =
+password =
+# 0 or 1
+only_nsfw = 1
+# 0 or 1, download images and attach them as files, only use as a fallback
+download_images = 0
+# Allowed sizes: square_medium, medium, large, original
+preferred_image_size = original
+# Max number of images in a gallery to post, 0 for unlimited
+images_limit = 6

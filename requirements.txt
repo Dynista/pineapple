@@ -23,3 +23,4 @@ yarl==1.4.2
 youtube-dl==2017.3.20
 arrow==0.15.6
 peewee==3.13.3
+pixivpy_async==1.2.11
