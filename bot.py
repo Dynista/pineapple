@@ -55,7 +55,7 @@ async def on_message(message):
             # Send the received message off to the Plugin Manager to handle the command
             words = message.content.partition(' ')
             await pm.handle_command(message, words[0][len(pm.botPreferences.commandPrefix):], words[1:])
-        elif message.guild is not None:
+        elif message.guild is not None and client.user.id != message.author.id:
             await pm.handle_message(message)
     except Exception as e:
         await message.channel.send("Error: " + str(e))
