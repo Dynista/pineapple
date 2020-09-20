@@ -62,6 +62,7 @@ class Plugin(AbstractPlugin):
     preferred_image_size: Literal['square_medium', 'medium', 'large', 'original']
     images_limit: int
     cache_dir: str
+    token_expires_at: int
 
     def __init__(self, pm):
         super().__init__(pm, "Pixiv")
@@ -72,6 +73,7 @@ class Plugin(AbstractPlugin):
         self.preferred_image_size = self.pm.botPreferences.get_config_value("Pixiv", "preferred_image_size")
         self.images_limit = int(self.pm.botPreferences.get_config_value("Pixiv", "images_limit"))
         self.cache_dir = os.path.join(pm.cache_dir, 'pixiv')
+        self.token_expires_at = 0
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
 
@@ -79,10 +81,25 @@ class Plugin(AbstractPlugin):
     def register_events():
         return [Events.Message("Pixiv")]
 
+    async def ensure_login(self):
+        now = int(time.time())
+        # give a minute grace period
+        if now > self.token_expires_at - 60:
+            await self.login()
+
     async def login(self):
+        if self.api.refresh_token is not None:
+            try:
+                res = await self.api.login(refresh_token=self.api.refresh_token)
+                self.token_expires_at = int(time.time()) + res['response']['expires_in']
+                return
+            except Exception:
+                # will try to login with credentials
+                pass
         username = self.pm.botPreferences.get_config_value("Pixiv", "username")
         password = self.pm.botPreferences.get_config_value("Pixiv", "password")
-        await self.api.login(username, password)
+        res = await self.api.login(username, password)
+        self.token_expires_at = int(time.time()) + res['response']['expires_in']
 
     async def handle_message(self, message_object):
         lower = message_object.content.lower()
@@ -121,12 +138,14 @@ class Plugin(AbstractPlugin):
 
     async def fetch_artwork_data(self, item_id: int, url: str) -> Optional[PixivArtwork]:
         try:
+            await self.ensure_login()
             json_response = await self.api.illust_detail(item_id)
             # print(json_response)
             # When the token expires we still seem to get a success response, but with 'error' field
             if 'error' in json_response:
                 raise Exception
         except Exception:
+            # exceptions shouldn't really happen, but leaving this just as an extra precaution
             await self.login()
             # Maybe catch error here too and log it?
             json_response = await self.api.illust_detail(item_id)
