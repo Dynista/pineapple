@@ -47,7 +47,7 @@ class Plugin(AbstractPlugin):
         text = text.lower()  # moves all tags to lowercase
         search_tags = set(text.split())  # splits tags on second_place
         blacklist = self.get_blacklist(message_object)
-        if len(search_tags) is 0:
+        if len(search_tags) == 0:
             await self.pm.clientWrap.send_message(self.name, message_object.channel, "Please enter tags to search.")
             return
         search_tags.discard("rating:questionable")  # no loopholes
@@ -69,7 +69,7 @@ class Plugin(AbstractPlugin):
             request_url += ("-" + tag + "%20")  # add "not tags" from blacklists to search
         response = requests.get(request_url)
         try:
-            if len(response.json()) is 0:
+            if len(response.json()) == 0:
                 await self.pm.clientWrap.send_message(self.name, message_object.channel,
                                                       "Can't find an image that matches your "
                                                       "tag(s) :cry:")
@@ -87,7 +87,7 @@ class Plugin(AbstractPlugin):
             img_response = response.json()[random.randint(0, len(response.json()) - 1)]  # find new image from query
             response_tags = set(img_response["tags"].split())  # split tags from results
             retries -= 1  # decrement recount timer
-            if retries is 0:
+            if retries == 0:
                 await self.pm.clientWrap.send_message(self.name, message_object.channel,
                                                       "Can't find an image that matches your "
                                                       "tag(s) :cry:")

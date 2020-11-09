@@ -15,7 +15,10 @@ logging.info("Starting Pineapple")
 logging.info("Starting Discord Client")
 # Creates a discord client, which we will use to connect and interact with the server.
 # All methods with @client.event annotations are event handlers for this client.
-client = discord.Client()
+
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
 
 logging.info("Loading plugins")
 # Loads and initializes the plugin manager for the bot
