@@ -22,16 +22,13 @@ class Plugin(AbstractPlugin):
         return [Events.Command("image",
                                desc="Search Gelbooru! Refer to the Gelbooru Cheat Sheet for tags "
                                     "http://gelbooru.com/index.php?page=help&topic=cheatsheet"),
-                Events.Command("nsfw", desc="spicier search"),
                 Events.Command("blacklist", Ranks.Mod,
                                desc="Adds gelbooru tag to blacklist"),
                 Events.Command("unblacklist", Ranks.Mod, desc="Remove a tag from the blacklist")]
 
     async def handle_command(self, message_object, command, args):
         if command == "image":
-            await self.search(message_object, args[1], nsfw=False)
-        if command == "nsfw":
-            await self.search(message_object, args[1], nsfw=True)
+            await self.search(message_object, args[1])
         if command == "blacklist":
             if args[1] is None or args[1] == "":
                 await self.print_blacklist(message_object)
@@ -43,7 +40,7 @@ class Plugin(AbstractPlugin):
     def get_models(self):
         return [BooruBlacklist]
 
-    async def search(self, message_object, text, nsfw):
+    async def search(self, message_object, text):
         text = text.lower()  # moves all tags to lowercase
         search_tags = set(text.split())  # splits tags on second_place
         blacklist = self.get_blacklist(message_object)
@@ -58,10 +55,9 @@ class Plugin(AbstractPlugin):
             await self.pm.clientWrap.send_message(self.name, message_object.channel,
                                                   "The tags used have been blacklisted by an Admin. :cry:")
             return
-        if not nsfw:
-            search_tags.add("rating:safe")  # append safe tag to URL if not nsfw
-        else:
-            search_tags.add("-rating:safe")  # append safe tag to URL if not nsfw
+
+        search_tags.add("rating:safe")  # append safe tag to URL
+
         request_url = self.base_url
         for tag in search_tags.difference(blacklist):
             request_url += (tag + "%20")  # add tags not contained in blacklist to search
@@ -110,7 +106,7 @@ class Plugin(AbstractPlugin):
             await message_object.channel.send("The image that was found was too large to "
                                               "upload. " + image_url)
         else:
-            await message_object.channel.send(file=discord.File(filename), content="**Source:** <" + gel_url + ">")
+            await message_object.channel.send(file=discord.File(filename), content= "**Source:** <" + gel_url + ">")
 
         os.remove(filename)
 
