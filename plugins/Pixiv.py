@@ -2,6 +2,7 @@ import re
 import os
 import time
 from datetime import datetime
+from enum import Enum, auto
 from typing import List, TypedDict, Literal, Optional
 from asyncio import gather
 from aiohttp import ClientSession
@@ -10,7 +11,10 @@ import discord
 from util import Events
 from AbstractPlugin import AbstractPlugin
 
-PROXY_URL = 'https://api.kotori.love/pixiv/image/'
+
+class Proxy(Enum):
+    kotori = auto()
+    pixivcat = auto()
 
 
 class PixivImageUrls(TypedDict):
@@ -45,12 +49,14 @@ def tag_list_to_string(tags: List[str]):
 
 
 # Get a proxy url for the given image
-def proxy_image_url(url: str):
-    parsed = re.match(r'https?://(?:www.)?(.*)', url)
-    if not parsed:
-        raise Exception('Invalid URL')
-    truncated = parsed.group(1)
-    return f'{PROXY_URL}{truncated}'
+def proxy_image_url(url: str, proxy: Proxy = Proxy.pixivcat):
+    if proxy is Proxy.kotori:
+        parsed = re.match(r'https?://(?:www.)?(.*)', url)
+        if not parsed:
+            raise Exception('Invalid URL')
+        truncated = parsed.group(1)
+        return f'https://api.kotori.love/pixiv/image/{truncated}'
+    return url.replace('i.pximg.net', 'i.pixiv.cat', 1)
 
 
 class Plugin(AbstractPlugin):
