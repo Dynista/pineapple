@@ -140,7 +140,7 @@ class Plugin(AbstractPlugin):
     async def set_default_channel(self, message_object):
         self.pm.botPreferences.set_database_config_value(message_object.guild.id,
                                                          "default_channel",
-                                                         message_object.guild.id)
+                                                         message_object.channel.id)
         await message_object.channel.send("Set default channel to: #" + message_object.channel.name)
 
     async def set_welcome_message(self, message_object, text):
